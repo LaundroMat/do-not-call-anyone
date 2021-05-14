@@ -63,8 +63,8 @@
                             </div>
                         </h2>
 
-                        <div class="flex justify-center mt-12 gap-x-8">
-                            <div class="p-4 rounded shadow-lg">
+                        <div class="md:flex justify-center mt-12 md:gap-x-8">
+                            <div class="p-4 md:rounded md:shadow-lg">
                                 <div class="text-gray-500 tracking-wider">
                                     Er zijn al
                                 </div>
@@ -123,115 +123,126 @@
                                 </p>
                             </div>
                         </div>
+                    </template>
+                    <template x-if="!dncm_account.id">
+                        <div class="my-12 p-8 rounded bg-indigo-100 text-indigo-900 text-center">
+                            <p>
+                                💪 Help mee om België <strong>telefoonspam-vrij</strong> te maken.
+                            </p>
+                            <p class="mt-2">
+                                Kies een zone 👇 om onder een fake account automatisch nummers toe te voegen aan de
+                                Belgische do-not-call
+                                lijst.
+                            </p>
+                        </div>
+                    </template>
                 </div>
-                </template>
-                <template x-if="!dncm_account.id">
-                    <div class="my-12 p-8 rounded bg-indigo-100 text-indigo-900 text-center">
-                        <p>
-                            💪 Help mee om België <strong>telefoonspam-vrij</strong> te maken.
-                        </p>
-                        <p class="mt-2">
-                            Kies een zone 👇 om onder een fake account automatisch nummers toe te voegen aan de
-                            Belgische do-not-call
-                            lijst.
-                        </p>
-                    </div>
-                </template>
-            </div>
 
-            <div class="flex justify-around text-3xl uppercase tracking-widest text-gray-300">
-                <div>Grote steden</div>
-                <div>Kleine steden</div>
-                <div>Mobiele nummers</div>
-            </div>
-            <div class="flex justify-around">
-                <template x-for="area_code_type in Object.keys(area_codes)">
+                <div class="md:flex justify-around text-3xl uppercase tracking-widest text-gray-300">
                     <div>
-                        <template x-for="area_code in area_codes[area_code_type]">
-                            <div class="transition duration-500 ease-in-out shadow-md px-4 py-2 hover:shadow-lg cursor-pointer my-4"
-                                @click="addPhoneNumbers(area_code)">
-                                <div class="flex gap-x-4 items-center">
-                                    <div x-text="area_code" class="text-3xl text-gray-600 font-bold"></div>
-                                    <div class="p-4">
-                                        <progress
-                                            x-bind:max="area_codes.LARGE_CITY_AREA_CODES.includes(area_code) ? '10000000' : '1000000'"
-                                            x-bind:value="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 1"></progress>
-                                    </div>
-                                </div>
-                                <div class="flex gap-x-2 text-gray-500">
-                                    <div
-                                        x-text="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 0">
-                                    </div>
-                                    <div>
-                                        /
-                                    </div>
-                                    <div
-                                        x-text="area_codes.LARGE_CITY_AREA_CODES.includes(area_code) ? '10.000.000' : '1.000.000'">
-                                    </div>
-                                </div>
+                        <a href="#LARGE_CITY_AREA_CODES">Grote steden</a>
+                    </div>
+                    <div>
+                        <a href="#SMALL_CITY_AREA_CODES">
+                            Kleine steden
+                        </a>
+                    </div>
+                    <div>
+                        <a href="#MOBILE_AREA_CODES">
+                            Mobiele nummers
+                        </a>
+                    </div>
+                </div>
+                <div class="md:flex justify-around">
+                    <template x-for="area_code_type in Object.keys(area_codes)">
+                        <div>
+                            <div class="md:hidden text-xl my-32" x-bind:id="area_code_type">
                             </div>
-                        </template>
-                    </div>
-                </template>
-            </div>
+                            <template x-for="area_code in area_codes[area_code_type]">
+                                <div class="transition duration-500 ease-in-out shadow-md px-4 py-2 hover:shadow-lg cursor-pointer my-4"
+                                    @click="addPhoneNumbers(area_code)">
+                                    <div class="flex gap-x-4 items-center">
+                                        <div x-text="area_code" class="text-3xl text-gray-600 font-bold"></div>
+                                        <div class="p-4">
+                                            <progress
+                                                x-bind:max="area_codes.LARGE_CITY_AREA_CODES.includes(area_code) ? '10000000' : '1000000'"
+                                                x-bind:value="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 1"></progress>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-x-2 text-gray-500">
+                                        <div
+                                            x-text="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 0">
+                                        </div>
+                                        <div>
+                                            /
+                                        </div>
+                                        <div
+                                            x-text="area_codes.LARGE_CITY_AREA_CODES.includes(area_code) ? '10.000.000' : '1.000.000'">
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
 
-            <div class="mt-16 font-bold text-gray-500 tracking-widest lowercase">
-                Getuigenissen
-            </div>
-            <div class="flex justify-between">
-                <div>
-                    <div class="flex flex-col max-w-md bg-white px-8 py-6 rounded-xl space-y-5 items-center">
-                        <img class="w-full rounded-md" src="./gan-1.jpg" alt="motivation" />
-                        <p class="text-center leading-relaxed">Als Compliance Officer van een van de grootste
-                            telemarketingbedrijven in België ben ik heel blij met dit initiatief.</p>
-                        <p class="text-center leading-relaxed">
-                            Nu ben ik eindelijk verlost van de stress dat we een boete riskeren als we per ongeluk
-                            iemand opbellen die op de do-not-call lijst staat.</p>
-                        <p class="text-center leading-relaxed">
-                            Nu we weten dat heel België op die do-not-call lijst
-                            komt, hebben we geen zorgen meer! </p>
-                        <span class="text-center">&mdash; Gustave von Aschenbach</span>
+                <div class="text-center md:text-left mt-16 font-bold text-gray-500 tracking-widest lowercase">
+                    Getuigenissen
+                </div>
+                <div class="lg:flex justify-between">
+                    <div>
+                        <div class="flex flex-col max-w-md bg-white px-8 py-6 rounded-xl space-y-5 items-center">
+                            <img class="w-full rounded-md" src="./gan-1.jpg" alt="motivation" />
+                            <p class="text-center leading-relaxed">Als Compliance Officer van een van de grootste
+                                telemarketingbedrijven in België ben ik heel blij met dit initiatief.</p>
+                            <p class="text-center leading-relaxed">
+                                Nu ben ik eindelijk verlost van de stress dat we een boete riskeren als we per ongeluk
+                                iemand opbellen die op de do-not-call lijst staat.</p>
+                            <p class="text-center leading-relaxed">
+                                Nu we weten dat heel België op die do-not-call lijst
+                                komt, hebben we geen zorgen meer! </p>
+                            <span class="text-center">&mdash; Gustave von Aschenbach</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex flex-col max-w-md bg-white px-8 py-6 rounded-xl space-y-5 items-center">
+                            <img class="w-full rounded-md" src="./gan-2.jpg" alt="motivation" />
+                            <p class="text-center leading-relaxed">Ik kan niet stoppen met zones aan te klikken en de
+                                nummers te zien passeren.</p>
+                            <p class="text-center leading-relaxed">Het is net alsof we heel België aan het vaccineren
+                                zijn tegen ongevraagde telemarketing!</p>
+                            <span class="text-center">&mdash; Holden Caulfield</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex flex-col max-w-md bg-white px-8 py-6 rounded-xl space-y-5 items-center">
+                            <img class="w-full rounded-md" src="./gan-3.jpg" alt="motivation" />
+                            <p class="text-center leading-relaxed">
+                                Ik wist zelfs niet dat zo'n lijst bestond!
+                            </p>
+                            <p class="text-center leading-relaxed">
+                                Ik voel me een heel ander mens nu ik weet dat ik nooit
+                                meer gestoord zal worden tijdens het lezen.
+                            </p>
+                            <span class="text-center">&mdash; Gregor Samsa</span>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <div class="flex flex-col max-w-md bg-white px-8 py-6 rounded-xl space-y-5 items-center">
-                        <img class="w-full rounded-md" src="./gan-2.jpg" alt="motivation" />
-                        <p class="text-center leading-relaxed">Ik kan niet stoppen met zones aan te klikken en de
-                            nummers te zien passeren.</p>
-                        <p class="text-center leading-relaxed">Het is net alsof we heel België aan het vaccineren
-                            zijn tegen ongevraagde telemarketing!</p>
-                        <span class="text-center">&mdash; Holden Caulfield</span>
-                    </div>
+
+                <div class="flex justify-center mt-16">
+                    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+                        data-name="bmc-button" data-slug="st8nicmpr" data-color="#FFDD00" data-emoji="🍺"
+                        data-font="Bree" data-text="Trakteer op een pintje" data-outline-color="#000000"
+                        data-font-color="#000000" data-coffee-color="#ffffff"></script>
                 </div>
-                <div>
-                    <div class="flex flex-col max-w-md bg-white px-8 py-6 rounded-xl space-y-5 items-center">
-                        <img class="w-full rounded-md" src="./gan-3.jpg" alt="motivation" />
-                        <p class="text-center leading-relaxed">
-                            Ik wist zelfs niet dat zo'n lijst bestond!
-                        </p>
-                        <p class="text-center leading-relaxed">
-                            Ik voel me een heel ander mens nu ik weet dat ik nooit
-                            meer gestoord zal worden tijdens het lezen.
-                        </p>
-                        <span class="text-center">&mdash; Gregor Samsa</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex justify-center mt-16">
-                <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
-                    data-name="bmc-button" data-slug="st8nicmpr" data-color="#FFDD00" data-emoji="🍺" data-font="Bree"
-                    data-text="Trakteer op een pintje" data-outline-color="#000000" data-font-color="#000000"
-                    data-coffee-color="#ffffff"></script>
-            </div>
 
 
-            <!-- Modal -->
+                <!-- Modal -->
 
-            <div x-cloak x-show="area_code_in_progress" class="fixed z-10 inset-0 overflow-y-auto"
-                aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                    <!--
+                <div x-cloak x-show="area_code_in_progress" class="fixed z-10 inset-0 overflow-y-auto"
+                    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <!--
               Background overlay, show/hide based on modal state.
         
               Entering: "ease-out duration-300"
@@ -241,13 +252,14 @@
                 From: "opacity-100"
                 To: "opacity-0"
             -->
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true">
-                    </div>
+                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true">
+                        </div>
 
-                    <!-- This element is to trick the browser into centering the modal contents. -->
-                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                        <!-- This element is to trick the browser into centering the modal contents. -->
+                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
+                            aria-hidden="true">&#8203;</span>
 
-                    <!--
+                        <!--
               Modal panel, show/hide based on modal state.
         
               Entering: "ease-out duration-300"
@@ -257,63 +269,61 @@
                 From: "opacity-100 translate-y-0 sm:scale-100"
                 To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             -->
-                    <div
-                        class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                            <div class="sm:flex sm:items-start">
-                                <div
-                                    class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                    <!-- Heroicon name: outline/exclamation -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z" />
-                                    </svg>
-                                </div>
-                                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                    <div class="flex gap-x-2">
-                                        <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                            Zone <span x-text="area_code_in_progress" class="font-semibold"></span>
-                                        </h3>
-                                        <div class="flex text-gray-500">
-                                            <div
-                                                x-text="overall_progress[area_code_in_progress] ? overall_progress[area_code_in_progress].latest : 0">
-                                            </div>
-                                            <div>/</div>
-                                            <div
-                                                x-text="area_codes.LARGE_CITY_AREA_CODES.includes(area_code_in_progress) ? '10.000.000' : '1.000.000'">
+                        <div
+                            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div class="sm:flex sm:items-start">
+                                    <div
+                                        class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                        <!-- Heroicon name: outline/exclamation -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z" />
+                                        </svg>
+                                    </div>
+                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                        <div class="flex gap-x-2">
+                                            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                                Zone <span x-text="area_code_in_progress" class="font-semibold"></span>
+                                            </h3>
+                                            <div class="flex text-gray-500">
+                                                <div
+                                                    x-text="overall_progress[area_code_in_progress] ? overall_progress[area_code_in_progress].latest : 0">
+                                                </div>
+                                                <div>/</div>
+                                                <div
+                                                    x-text="area_codes.LARGE_CITY_AREA_CODES.includes(area_code_in_progress) ? '10.000.000' : '1.000.000'">
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="mt-2">
-                                        <p class="text-sm text-gray-500">
-                                            <span
-                                                x-text="overall_progress[area_code_in_progress] ? lastCreatedPhoneNumber : ''">
-                                            </span>
-                                        </p>
+                                        <div class="mt-2">
+                                            <p class="text-sm text-gray-500">
+                                                <span
+                                                    x-text="overall_progress[area_code_in_progress] ? lastCreatedPhoneNumber : ''">
+                                                </span>
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                            <button type="button"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                @click="area_code_in_progress = null">
-                                Stoppen
-                            </button>
+                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button type="button"
+                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                    @click="area_code_in_progress = null">
+                                    Stoppen
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
         </main>
         <footer class="mt-32 p-4 bg-gray-100">
             <div class="container mx-auto text-gray-500 text-sm w-3/4">
                 <div>
                     <p class="my-2">
                         Bugs & feedback: <a class="underline" href="https://twitter.com/ProofOfThePuddn"
-                            target="_blank">@ProofOfThePuddn</a> (<a class="underline"
-                            href="https://threadreaderapp.com/thread/1393303507852267526.html"
-                            targer="_blank">achtergrond van deze site</a>)
+                            target="_blank">@ProofOfThePuddn</a>
                     </p>
                     <p class="my-2">
                         Enige gelijkenis tussen getuigen en echte mensen zijn louter toevallig en de schuld van een <a
@@ -324,6 +334,10 @@
                     </p>
                     <p class="my-2">
                         Welcome stranger, stay a stranger! Hier vind je alleen functionele cookies.
+                    </p>
+                    <p class="my-2">
+                        <a class="underline" href="https://threadreaderapp.com/thread/1393303507852267526.html"
+                            target="_blank">achtergrond</a>
                     </p>
                 </div>
             </div>
