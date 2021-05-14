@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "set NODE_ENV=develop&& npx tailwindcss-cli@latest build -o ./dist/tailwind.css",
-    "build": "set NODE_ENV=production&& npx tailwindcss-cli@latest build -o ./dist/tailwind.css"
+    "build": "set NODE_ENV=production&& npx tailwindcss-cli@latest build -o ./dist/tailwind.css&& mv ./src/*.jpg ./dist&& mv ./src/*.html ./dist"
   },
   "dependencies": {}
 }
