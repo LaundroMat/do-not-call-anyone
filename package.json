@@ -1,0 +1,12 @@
+{
+  "name": "do-not-call-anyone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "tailwind.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "set NODE_ENV=develop&& npx tailwindcss-cli@latest build -o ./dist/tailwind.css",
+    "build": "set NODE_ENV=production&& npx tailwindcss-cli@latest build -o ./dist/tailwind.css"
+  },
+  "dependencies": {}
+}

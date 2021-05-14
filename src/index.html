@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Do not call -- </title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chance/1.1.7/chance.min.js"
+        integrity="sha512-dELYIOEzIECWdvsEdoywFOB4qKDmtQee33yD0dQnzAE7eBGKJ984VQXRLs/vlsP4Sb3VchbQL7iAy4NWqetCsw=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js"
+        integrity="sha256-JLmknTdUZeZZ267LP9qB+/DT7tvxOOKctSKeUC2KT6E=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
+    <link href="./tailwind.css" rel="stylesheet">
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="">
+    <div class="flex flex-col h-screen">
+
+        <main class="container mx-auto px-2 md:px-0">
+            <div x-data="doNotCall()" x-init="init()">
+                <div>
+                    <div class="text-center">
+                        <h1 class="mt-16 text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                            <div>Do not call</div>
+                            <div class="text-indigo-600">anyone</div>
+                        </h1>
+                        <h2 class="mt-12 text-base text-gray-500 sm:mt-5 sm:text-lg md:mt-5 md:text-2xl">
+                            <div>
+                                Help ongewenste telefoontjes de wereld uit 🚀💥
+                            </div>
+                        </h2>
+
+                        <div class="flex justify-center mt-12 gap-x-8">
+                            <div class="p-4 rounded shadow-lg">
+                                <div class="text-gray-500 tracking-wider">
+                                    Er zijn al
+                                </div>
+                                <div class="text-6xl font-extrabold text-indigo-600" x-text="overallProgress">
+                                </div>
+                                <div class="text-gray-500 tracking-wider">
+                                    telefoonnummers automatisch ingediend
+                                </div>
+                            </div>
+                            <div class="p-4 rounded shadow-lg">
+                                <div class="text-gray-500 tracking-wider">
+                                    Dat is
+                                </div>
+                                <div class="text-6xl font-extrabold text-indigo-600">
+                                    <span
+                                        x-text="new Intl.NumberFormat('nl-BE', { style: 'decimal', maximumFractionDigits: 6}).format(overallProgressPercentage)"></span>%
+                                </div>
+                                <div class="text-gray-500 tracking-wider">
+                                    van alle 202 miljoen mogelijke nummers in België
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <template x-if="dncm_account.id">
+                        <div class="my-12 p-8 rounded bg-green-100 text-green-900 text-center">
+                            <p>
+                                🙏 België is je dankbaar!
+                            </p>
+                            <p class="mt-4">
+                                Je kan je bijdrages controleren op <a class="underline" href="https://www.dncm.be/nl/app/login-nl/"
+                                    target="_blank">dncm.be</a> met
+                            </p>
+                            <p class="font-mono">
+                                inlognaam: <span x-text="dncm_account.login"></span>
+                            </p>
+                            <p class="font-mono">
+                                wachtwoord: <span x-text="dncm_account.password"></span>
+                            </p>
+                        </div>
+                    </template>
+                    <template x-if="!dncm_account.id">
+                        <div class="my-12 p-8 rounded bg-indigo-100 text-indigo-900 text-center">
+                            <p>
+                                💪 Help mee om België <strong>telefoonspam-vrij</strong> te maken.
+                            </p>
+                            <p class="mt-2">
+                                Kies een zone 👇 om onder een fake account automatisch nummers toe te voegen aan de
+                                Belgische do-not-call
+                                lijst.
+                            </p>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="flex justify-around text-3xl uppercase tracking-widest text-gray-300">
+                    <div>Grote steden</div>
+                    <div>Kleine steden</div>
+                    <div>Mobiele nummers</div>
+                </div>
+                <div class="flex justify-around">
+                    <template x-for="area_code_type in Object.keys(area_codes)">
+                        <div>
+                            <template x-for="area_code in area_codes[area_code_type]">
+                                <div class="transition duration-500 ease-in-out shadow-md px-4 py-2 hover:shadow-lg cursor-pointer my-4"
+                                    @click="addPhoneNumbers(area_code)">
+                                    <div class="flex gap-x-4 items-center">
+                                        <div x-text="area_code" class="text-3xl text-gray-600 font-bold"></div>
+                                        <div class="p-4">
+                                            <progress
+                                                x-bind:max="area_codes.LARGE_CITY_AREA_CODES.includes(area_code) ? '10000000' : '1000000'"
+                                                x-bind:value="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 1"></progress>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-x-2 text-gray-500">
+                                        <div
+                                            x-text="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 0">
+                                        </div>
+                                        <div>
+                                            /
+                                        </div>
+                                        <div
+                                            x-text="area_codes.LARGE_CITY_AREA_CODES.includes(area_code) ? '10.000.000' : '1.000.000'">
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="mt-16 font-bold text-gray-500 tracking-widest lowercase">
+                    Getuigenissen
+                </div>
+                <div class="flex justify-between">
+                    <div>
+                        <div class="flex flex-col max-w-md bg-white px-8 py-6 rounded-xl space-y-5 items-center">
+                            <img class="w-full rounded-md" src="./gan-1.jpg" alt="motivation" />
+                            <p class="text-center leading-relaxed">Als Compliance Officer van een van de grootste
+                                telemarketingbedrijven in België ben ik heel blij met dit initiatief.</p>
+                            <p class="text-center leading-relaxed">
+                                Nu ben ik eindelijk verlost van de stress dat we een boete riskeren als we per ongeluk
+                                iemand opbellen die op de do-not-call lijst staat.</p>
+                            <p class="text-center leading-relaxed">
+                                Nu we weten dat heel België op die do-not-call lijst
+                                komt, hebben we geen zorgen meer! </p>
+                            <span class="text-center">&mdash; Gustave von Aschenbach</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex flex-col max-w-md bg-white px-8 py-6 rounded-xl space-y-5 items-center">
+                            <img class="w-full rounded-md" src="./gan-2.jpg" alt="motivation" />
+                            <p class="text-center leading-relaxed">Ik kan niet stoppen met zones aan te klikken en de
+                                nummers te zien passeren.</p>
+                            <p class="text-center leading-relaxed">Het is net alsof we heel België aan het vaccineren
+                                zijn tegen ongevraagde telemarketing!</p>
+                            <span class="text-center">&mdash; Holden Caulfield</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex flex-col max-w-md bg-white px-8 py-6 rounded-xl space-y-5 items-center">
+                            <img class="w-full rounded-md" src="./gan-3.jpg" alt="motivation" />
+                            <p class="text-center leading-relaxed">
+                                Ik wist zelfs niet dat zo'n lijst bestond!
+                            </p>
+                            <p class="text-center leading-relaxed">
+                                Ik voel me een heel ander mens nu ik weet dat ik nooit
+                                meer gestoord zal worden tijdens het lezen.
+                            </p>
+                            <span class="text-center">&mdash; Gregor Samsa</span>
+                        </div>
+                    </div>
+                </div>
+                <div x-cloak x-show="area_code_in_progress" class="fixed z-10 inset-0 overflow-y-auto"
+                    aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <!--
+              Background overlay, show/hide based on modal state.
+        
+              Entering: "ease-out duration-300"
+                From: "opacity-0"
+                To: "opacity-100"
+              Leaving: "ease-in duration-200"
+                From: "opacity-100"
+                To: "opacity-0"
+            -->
+                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true">
+                        </div>
+
+                        <!-- This element is to trick the browser into centering the modal contents. -->
+                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
+                            aria-hidden="true">&#8203;</span>
+
+                        <!--
+              Modal panel, show/hide based on modal state.
+        
+              Entering: "ease-out duration-300"
+                From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                To: "opacity-100 translate-y-0 sm:scale-100"
+              Leaving: "ease-in duration-200"
+                From: "opacity-100 translate-y-0 sm:scale-100"
+                To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            -->
+                        <div
+                            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div class="sm:flex sm:items-start">
+                                    <div
+                                        class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                        <!-- Heroicon name: outline/exclamation -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z" />
+                                        </svg>
+                                    </div>
+                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                            Zone <span x-text="area_code_in_progress" class="font-semibold"></span> aan
+                                            het
+                                            inschrijven...
+                                        </h3>
+                                        <div class="mt-2">
+                                            <p class="text-sm text-gray-500"
+                                                x-text="overall_progress[area_code_in_progress] ? lastCreatedPhoneNumber : ''">
+                                            </p>
+                                        </div>
+                                        <div x-text="JSON.stringify(dncm_account)">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button type="button"
+                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                    @click="area_code_in_progress = null">
+                                    Stoppen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="mt-32 p-4 bg-gray-100">
+            <div class="container mx-auto text-gray-500">
+                <p>
+                    Bugs & feedback: <a href="https://twitter.com/ProofOfThePuddn" target="_blank">@ProofOfThePuddn</a>
+                </p>
+                <p>
+                    Enige gelijkenis tussen getuigen en echte mensen zijn louter toevallig en de schuld van een <a
+                        class="underline" href="https://www.thispersondoesnotexist.com/">AI</a>. Ik ben niet
+                    verantwoordelijk voor wat mensen uitspoken met de dingen die ik maak. Als wapenhandelaren dat niet
+                    zijn, ik ook niet.
+                </p>
+                <p>
+                    Cookies op deze site zijn louter functioneel. Hello stranger, stay a stranger!
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+
+    <!-- Add SDKs for Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.5.0/firebase-firestore.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyBsbeu2LaSiQbfBB53BRm_scEQ8VCQ4DSg",
+            authDomain: "do-not-call-e7284.firebaseapp.com",
+            projectId: "do-not-call-e7284",
+            storageBucket: "do-not-call-e7284.appspot.com",
+            messagingSenderId: "464359768595",
+            appId: "1:464359768595:web:0ac08b97908243738b35e6"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+</body>
+<script>
+
+    const DEBUG = false
+
+    var db = firebase.firestore();
+
+    // const API_URL = "http://127.0.0.1:5000/"
+
+    const AREA_CODES = {
+        LARGE_CITY_AREA_CODES: ["02", "03", "04", "09"],
+        SMALL_CITY_AREA_CODES: ["010", "011", "012", "013", "014", "015", "016", "019", "050", "051", "052", "053", "054", "055", "056", "057", "058", "059", "060", "061", "063", "064", "065", "067", "068", "069", "071", "080", "081", "082",
+            "083", "084", "085", "086", "087", "089"],
+        MOBILE_AREA_CODES: ['0455', '0456', '0457', '0458', '0459', '0460', '04610', '04611', '04612', '04613', '04614', '04615', '04616', '04617', '04618', '04619', '04620', '04621', '04622', '04623', '04624', '04625', '04626', '04627',
+            '04628', '04629', '04630', '04631', '04632', '04633', '04634', '04635', '04636', '04637', '04638', '04639', '04640', '04641', '04642', '04643', '04644', '04645', '04646', '04647', '04648', '04649', '04650', '04651',
+            '04652', '04653', '04654', '04655', '04656', '04657', '04658', '04659', '04660', '04661', '04662', '04663', '04664', '04665', '04666', '04667', '04668', '04669', '04670', '04671', '04672', '04673', '04674', '04675',
+            '04676', '04677', '04678', '04679', '04680', '04681', '04682', '04683', '04684', '04685', '04686', '04687', '04688', '04689', '0469', '0470', '0471', '0472', '0473', '0474', '0475', '0476', '0477', '0478', '0479',
+            '04800', '04801', '04802', '04803', '04804', '04805', '04806', '04807', '04808', '04809', '0481', '0482', '0483', '0484', '0485', '0486', '0487', '0488', '0489', '0490', '0491', '0492', '0493', '0494', '0495',
+            '0496', '0497', '0498', '0499']
+    }
+
+    // h/t https://stackoverflow.com/a/40252740
+    timerPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            // callback function for timer, gets called after the time-delay
+            console.log("2 seconds up, resolving myTimerPromise")
+            resolve();
+        }, 2000);  // Use this to at least wait 1 second before doing next push to dnccm 
+    });
+
+
+    function doNotCall() {
+        return {
+            area_codes: {},
+
+            dncm_account: {},
+            overall_progress: {},   // DB data {area_code: int, latest: int}
+
+            area_code_in_progress: null,
+
+            init: async function () {
+                // response = await axios.get(API_URL)
+                this.area_codes = AREA_CODES
+                db.collection("area_codes").onSnapshot((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        // doc.data() is never undefined for query doc snapshots
+                        Object.assign(this.overall_progress, { [doc.id]: doc.data() })
+                    });
+                })
+            },
+
+            get overallProgress() {
+                return Object.keys(this.overall_progress).map(area => this.overall_progress[area].latest | 0).reduce((p1, p2) => p1 + p2, 0)
+            },
+
+            get overallProgressPercentage() {
+                return this.overallProgress / 22000000
+            },
+
+            createDNCMAccount: async function () {
+                const languages = ['nl', 'fr', 'de', 'en']
+                const genders = ['M', 'F']
+
+                const email = chance.email()
+
+                let fake_user_data = {
+                    'login': email,
+                    'email': email,
+                    'pass': chance.string({ length: 12 }),    // (length is 6 - 60 for API). And yes, API requires "pass" here
+                    'firstName': chance.first(),
+                    'lastName': chance.last(),
+                    'language': languages[Math.floor(Math.random() * languages.length)],
+                    'gender': genders[Math.floor(Math.random() * genders.length)]
+                }
+
+                response = await axios.post('https://www.dncm.be/wp-json/app/v1/consumerregistration', fake_user_data)
+                console.debug(response)
+                console.debug(response.data)
+                Object.assign(this.dncm_account, response.data, { 'password': fake_user_data.pass })
+
+                // Get token too
+
+                response = await axios.post("https://www.dncm.be/wp-json/jwt-auth/v1/token", {
+                    username: fake_user_data.login,
+                    password: fake_user_data.pass
+                })
+                console.debug(response)
+                console.debug(response.data)
+                Object.assign(this.dncm_account, { token: response.data.token })
+            },
+
+            addPhoneNumbers: async function (area_code) {
+
+                // response = await axios.post(`${API_URL}account/new`)
+                // this.dncm_account = await response.data
+
+                this.area_code_in_progress = area_code
+
+                if (!DEBUG) {
+                    // Create fake account if not set yet.
+                    if (!this.dncm_account.id) {
+                        await this.createDNCMAccount()
+                    }
+                }
+
+                console.debug(JSON.stringify(this.dncm_account))
+
+                let self = this
+
+                while (this.area_code_in_progress) {
+                    components = this.__intToPhoneNumberComponents(area_code)
+
+                    post_data = {
+                        'number': `${components.cc}${components.zone}${components.digits}`,
+                        'user': this.dncm_account.id,
+                        'name': `${chance.first()} ${chance.last()}`
+                    }
+
+                    console.debug("Posting", JSON.stringify(post_data))
+
+                    if (!DEBUG) {
+                        await Promise.all([timerPromise, axios.post("https://www.dncm.be/wp-json/app/v1/number", post_data, {
+                            headers: { Authorization: `Bearer ${this.dncm_account.token}` }
+                        })])
+
+
+                        // response = await axios.post("https://www.dncm.be/wp-json/app/v1/number", post_data, {
+                        //     headers: { Authorization: `Bearer ${this.dncm_account.auth_token}` }
+                        // })
+                    } else {
+                        console.info(`Would have posted: ${JSON.stringify(post_data)}`)
+                        await new Promise(r => setTimeout(r, 1500));
+                    }
+
+                    if (this.overall_progress[area_code]) {
+                        await db.collection('area_codes').doc(area_code).update("latest", firebase.firestore.FieldValue.increment(1))
+                    } else {
+                        await db.collection('area_codes').doc(area_code).set({ latest: 1 })
+                    }
+
+                    // Quit when max range passed
+                    if (this.area_codes.LARGE_CITY_AREA_CODES.includes(area_code)) {
+                        if (this.overall_progress[area_code].latest > 10000000) {
+                            // Reached the end!
+                            this.area_code_in_progress = null
+                        }
+                    } else {
+                        if (this.overall_progress[area_code].latest > 1000000) {
+                            // Reached the end!
+                            this.area_code_in_progress = null
+                        }
+                    }
+                }
+            },
+
+            __intToPhoneNumberComponents: function (area_code) {
+                pn = this.overall_progress[area_code] ? this.overall_progress[area_code].latest : 0
+                let padding = 6 // For 0xx and mobile area codes
+                if (this.area_codes.LARGE_CITY_AREA_CODES.includes(area_code)) {
+                    padding = 7
+                }
+                return {
+                    'cc': '+32',
+                    'zone': area_code.substring(1),
+                    'digits': pn.toString().padStart(padding, "0")
+                }
+            },
+
+            get lastCreatedPhoneNumber() {
+                if (this.area_code_in_progress) {
+                    components = this.__intToPhoneNumberComponents(this.area_code_in_progress)
+                    return `${components.cc} ${components.zone} ${components.digits.slice(0, -4)} ${components.digits.slice(-4, -2)} ${components.digits.slice(-2)}`
+                } else {
+                    ''
+                }
+            }
+        }
+    }
+</script>
+
+</html>
