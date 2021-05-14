@@ -43,6 +43,10 @@
         [x-cloak] {
             display: none !important;
         }
+
+        .flash {
+            background: #d1fae5 !important;
+        }
     </style>
 </head>
 
@@ -159,25 +163,28 @@
                             <div class="md:hidden text-xl my-32" x-bind:id="area_code_type">
                             </div>
                             <template x-for="area_code in area_codes[area_code_type]">
-                                <div class="transition duration-500 ease-in-out shadow-md px-4 py-2 hover:shadow-lg cursor-pointer my-4"
+                                <div class="transition duration-500 ease-in-out rounded shadow-md hover:shadow-xl cursor-pointer my-4"
                                     @click="addPhoneNumbers(area_code)">
-                                    <div class="flex gap-x-4 items-center">
-                                        <div x-text="area_code" class="text-3xl text-gray-600 font-bold"></div>
-                                        <div class="p-4">
-                                            <progress
-                                                x-bind:max="area_codes.LARGE_CITY_AREA_CODES.includes(area_code) ? '10000000' : '1000000'"
-                                                x-bind:value="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 1"></progress>
+                                    <div class="transition duration-50 px-4 py-2"
+                                        :class="{ 'bg-green-100': area_code == pinged_area_code }">
+                                        <div class="flex gap-x-4 items-center">
+                                            <div x-text="area_code" class="text-3xl text-gray-600 font-bold"></div>
+                                            <div class=" p-4">
+                                                <progress
+                                                    x-bind:max="area_codes.LARGE_CITY_AREA_CODES.includes(area_code) ? '10000000' : '1000000'"
+                                                    x-bind:value="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 1"></progress>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="flex gap-x-2 text-gray-500">
-                                        <div
-                                            x-text="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 0">
-                                        </div>
-                                        <div>
-                                            /
-                                        </div>
-                                        <div
-                                            x-text="area_codes.LARGE_CITY_AREA_CODES.includes(area_code) ? '10.000.000' : '1.000.000'">
+                                        <div class="flex gap-x-2 text-gray-500">
+                                            <div
+                                                x-text="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 0">
+                                            </div>
+                                            <div>
+                                                /
+                                            </div>
+                                            <div
+                                                x-text="area_codes.LARGE_CITY_AREA_CODES.includes(area_code) ? '10.000.000' : '1.000.000'">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -338,6 +345,8 @@
                     <p class="my-2">
                         <a class="underline" href="https://threadreaderapp.com/thread/1393303507852267526.html"
                             target="_blank">achtergrond</a>
+                        <a class="underline" href="https://github.com/LaundroMat/do-not-call-anyone"
+                            target="_blank">broncode</a>
                     </p>
                 </div>
             </div>
@@ -388,7 +397,6 @@
     timerPromise = new Promise((resolve, reject) => {
         setTimeout(() => {
             // callback function for timer, gets called after the time-delay
-            console.log("2 seconds up, resolving myTimerPromise")
             resolve();
         }, 2000);  // Use this to at least wait 1 second before doing next push to dnccm 
     });
@@ -405,6 +413,8 @@
 
             phone_numbers_created_this_session: 0,
 
+            pinged_area_code: null, // area code being updated (i.e. modified in firestore, so also when someone else does it)
+
             init: async function () {
                 // response = await axios.get(API_URL)
                 this.area_codes = AREA_CODES
@@ -412,6 +422,13 @@
                     querySnapshot.forEach((doc) => {
                         // doc.data() is never undefined for query doc snapshots
                         Object.assign(this.overall_progress, { [doc.id]: doc.data() })
+                    });
+                    querySnapshot.docChanges().forEach((change) => {
+                        if (change.type == "modified") {
+                            this.pinged_area_code = change.doc.id
+                            setTimeout(() => this.pinged_area_code = null, 1000)
+                            // window.setTimeout(this.clearUpdateAnimationClass, 900)
+                        }
                     });
                 })
             },
@@ -506,6 +523,8 @@
                     } else {
                         await db.collection('area_codes').doc(area_code).set({ latest: 1 })
                     }
+
+                    // 
 
                     // Quit when max range passed
                     if (this.area_codes.LARGE_CITY_AREA_CODES.includes(area_code)) {
