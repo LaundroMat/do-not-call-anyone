@@ -67,30 +67,32 @@
                             </div>
                         </h2>
 
-                        <div class="md:flex justify-center mt-12 md:gap-x-8">
-                            <div class="p-4 md:rounded md:shadow-lg">
-                                <div class="text-gray-500 tracking-wider">
-                                    Er zijn al
+                        <template x-show="!quota_exceeded">
+                            <div class="md:flex justify-center mt-12 md:gap-x-8">
+                                <div class="p-4 md:rounded md:shadow-lg">
+                                    <div class="text-gray-500 tracking-wider">
+                                        Er zijn al
+                                    </div>
+                                    <div class="text-6xl font-extrabold text-indigo-600" x-text="overallProgress">
+                                    </div>
+                                    <div class="text-gray-500 tracking-wider">
+                                        telefoonnummers automatisch ingediend
+                                    </div>
                                 </div>
-                                <div class="text-6xl font-extrabold text-indigo-600" x-text="overallProgress">
-                                </div>
-                                <div class="text-gray-500 tracking-wider">
-                                    telefoonnummers automatisch ingediend
+                                <div class="p-4 rounded shadow-lg">
+                                    <div class="text-gray-500 tracking-wider">
+                                        Dat is
+                                    </div>
+                                    <div class="text-6xl font-extrabold text-indigo-600">
+                                        <span
+                                            x-text="new Intl.NumberFormat('nl-BE', { style: 'decimal', maximumFractionDigits: 6}).format(overallProgressPercentage)"></span>%
+                                    </div>
+                                    <div class="text-gray-500 tracking-wider">
+                                        van alle 202 miljoen mogelijke nummers in België
+                                    </div>
                                 </div>
                             </div>
-                            <div class="p-4 rounded shadow-lg">
-                                <div class="text-gray-500 tracking-wider">
-                                    Dat is
-                                </div>
-                                <div class="text-6xl font-extrabold text-indigo-600">
-                                    <span
-                                        x-text="new Intl.NumberFormat('nl-BE', { style: 'decimal', maximumFractionDigits: 6}).format(overallProgressPercentage)"></span>%
-                                </div>
-                                <div class="text-gray-500 tracking-wider">
-                                    van alle 202 miljoen mogelijke nummers in België
-                                </div>
-                            </div>
-                        </div>
+                        </template>
                     </div>
 
                     <template x-if="dncm_account.id">
@@ -164,7 +166,7 @@
                             </div>
                             <template x-for="area_code in area_codes[area_code_type]">
                                 <div class="transition duration-500 ease-in-out rounded shadow-md hover:shadow-xl cursor-pointer my-4"
-                                    @click="addPhoneNumbers(area_code)">
+                                    @click="addPhoneNumbers(area_code)" :class="{'cursor-default': quota_exceeded}">
                                     <div class="transition duration-50 px-4 py-2"
                                         :class="{ 'bg-green-100': area_code == pinged_area_code }">
                                         <div class="flex gap-x-4 items-center">
@@ -175,17 +177,19 @@
                                                     x-bind:value="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 1"></progress>
                                             </div>
                                         </div>
-                                        <div class="flex gap-x-2 text-gray-500">
-                                            <div
-                                                x-text="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 0">
+                                        <template x-show="!quota_exceeded">
+                                            <div class="flex gap-x-2 text-gray-500">
+                                                <div
+                                                    x-text="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 0">
+                                                </div>
+                                                <div>
+                                                    /
+                                                </div>
+                                                <div
+                                                    x-text="area_codes.LARGE_CITY_AREA_CODES.includes(area_code) ? '10.000.000' : '1.000.000'">
+                                                </div>
                                             </div>
-                                            <div>
-                                                /
-                                            </div>
-                                            <div
-                                                x-text="area_codes.LARGE_CITY_AREA_CODES.includes(area_code) ? '10.000.000' : '1.000.000'">
-                                            </div>
-                                        </div>
+                                        </template>
                                     </div>
                                 </div>
                             </template>
@@ -246,7 +250,7 @@
 
                 <!-- Modal -->
 
-                <div x-cloak x-show="area_code_in_progress" class="fixed z-10 inset-0 overflow-y-auto"
+                <div x-cloak x-show="area_code_in_progress || quota_exceeded" class="fixed z-10 inset-0 overflow-y-auto"
                     aria-labelledby="modal-title" role="dialog" aria-modal="true">
                     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                         <!--
@@ -276,52 +280,94 @@
                 From: "opacity-100 translate-y-0 sm:scale-100"
                 To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             -->
-                        <div
-                            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <div class="sm:flex sm:items-start">
-                                    <div
-                                        class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                        <!-- Heroicon name: outline/exclamation -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z" />
-                                        </svg>
-                                    </div>
-                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                        <div class="flex gap-x-2">
-                                            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                                Zone <span x-text="area_code_in_progress" class="font-semibold"></span>
-                                            </h3>
-                                            <div class="flex text-gray-500">
-                                                <div
-                                                    x-text="overall_progress[area_code_in_progress] ? overall_progress[area_code_in_progress].latest : 0">
-                                                </div>
-                                                <div>/</div>
-                                                <div
-                                                    x-text="area_codes.LARGE_CITY_AREA_CODES.includes(area_code_in_progress) ? '10.000.000' : '1.000.000'">
-                                                </div>
-                                            </div>
+                        <template x-if="quota_exceeded">
+                            <div
+                                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    <div class="sm:flex sm:items-start">
+                                        <div
+                                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                            <!-- Heroicon name: outline/exclamation -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
                                         </div>
-                                        <div class="mt-2">
-                                            <p class="text-sm text-gray-500">
-                                                <span
-                                                    x-text="overall_progress[area_code_in_progress] ? lastCreatedPhoneNumber : ''">
-                                                </span>
-                                            </p>
+                                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                            <h3 class="text-xl leading-6 font-bold text-gray-900">
+                                                Oh nee!
+                                            </h3>
+                                            <div class="mt-2">
+                                                <p class="text-gray-700">
+                                                    We zijn over de limiet gegaan voor vandaag...
+                                                </p>
+                                                <p class="text-gray-700 mt-2">
+                                                    Morgen is die limiet weer opgeheven en kunnen we weer doorgaan! 💪
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse text-center">
+                                    <p class="text-xs text-gray-500">
+                                        Als je wil kan je <a href="https://www.buymeacoffee.com/st8nicmpr"
+                                            target="_blank" class="underline">bijdragen in de serverkosten</a> zodat dit
+                                        minder (of nooit meer)
+                                        gebeurt.
+                                    </p>
+                                </div>
                             </div>
-                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                <button type="button"
-                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                    @click="area_code_in_progress = null">
-                                    Stoppen
-                                </button>
+                        </template>
+                        <template x-if="!quota_exceeded">
+                            <div
+                                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    <div class="sm:flex sm:items-start">
+                                        <div
+                                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                                            <!-- Heroicon name: outline/exclamation -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                            <div class="flex gap-x-2">
+                                                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                                    Zone <span x-text="area_code_in_progress"
+                                                        class="font-semibold"></span>
+                                                </h3>
+                                                <div class="flex text-gray-500">
+                                                    <div
+                                                        x-text="overall_progress[area_code_in_progress] ? overall_progress[area_code_in_progress].latest : 0">
+                                                    </div>
+                                                    <div>/</div>
+                                                    <div
+                                                        x-text="area_codes.LARGE_CITY_AREA_CODES.includes(area_code_in_progress) ? '10.000.000' : '1.000.000'">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2">
+                                                <p class="text-sm text-gray-500">
+                                                    <span
+                                                        x-text="overall_progress[area_code_in_progress] ? lastCreatedPhoneNumber : ''">
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                    <button type="button"
+                                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                        @click="area_code_in_progress = null">
+                                        Stoppen
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        </template>
                     </div>
                 </div>
         </main>
@@ -415,22 +461,35 @@
 
             pinged_area_code: null, // area code being updated (i.e. modified in firestore, so also when someone else does it)
 
+            quota_exceeded: false,
+
             init: async function () {
                 // response = await axios.get(API_URL)
                 this.area_codes = AREA_CODES
-                db.collection("area_codes").onSnapshot((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        // doc.data() is never undefined for query doc snapshots
-                        Object.assign(this.overall_progress, { [doc.id]: doc.data() })
-                    });
-                    querySnapshot.docChanges().forEach((change) => {
-                        if (change.type == "modified") {
-                            this.pinged_area_code = change.doc.id
-                            setTimeout(() => this.pinged_area_code = null, 1000)
-                            // window.setTimeout(this.clearUpdateAnimationClass, 900)
+                db.collection("area_codes")
+                    .onSnapshot((querySnapshot) => {
+                        querySnapshot.forEach((doc) => {
+                            try {
+                                Object.assign(this.overall_progress, { [doc.id]: doc.data() })
+                            } catch {
+                                alert('jaj')
+                            }
+                            // doc.data() is never undefined for query doc snapshots
+                        })
+                        querySnapshot.docChanges().forEach((change) => {
+                            if (change.type == "modified") {
+                                this.pinged_area_code = change.doc.id
+                                setTimeout(() => this.pinged_area_code = null, 1000)
+                                // window.setTimeout(this.clearUpdateAnimationClass, 900)
+                            }
+                        });
+                    }, error => {
+                        console.warn(JSON.stringify(error))
+                        if (error.code == "resource-exhausted") {
+                            this.quota_exceeded = true
                         }
-                    });
-                })
+                    })
+
             },
 
             get overallProgress() {
