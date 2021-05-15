@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Do not call -- </title>
+    <title>Do not call anyone.</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chance/1.1.7/chance.min.js"
         integrity="sha512-dELYIOEzIECWdvsEdoywFOB4qKDmtQee33yD0dQnzAE7eBGKJ984VQXRLs/vlsP4Sb3VchbQL7iAy4NWqetCsw=="
         crossorigin="anonymous"></script>
@@ -73,7 +73,8 @@
                                     <div class="text-gray-500 tracking-wider">
                                         Er zijn al
                                     </div>
-                                    <div class="text-6xl font-extrabold text-indigo-600" x-text="overallProgress">
+                                    <div class="text-6xl font-extrabold text-indigo-600"
+                                        x-text="new Intl.NumberFormat('nl-BE', {style: 'decimal'}).format(overallProgress)">
                                     </div>
                                     <div class="text-gray-500 tracking-wider">
                                         telefoonnummers automatisch ingediend
@@ -95,42 +96,51 @@
                         </template>
                     </div>
 
-                    <template x-if="dncm_account.id">
-                        <div class="my-12 pt-8 pb-2 rounded bg-green-100 text-green-900 text-center mx-auto">
-                            <div class="flex justify-center items-center">
-                                <p>
-                                    🙏 België is je dankbaar voor de <span class=""
-                                        x-text="phone_numbers_created_this_session"></span> nummers die je hebt
-                                    toegevoegd!
-                                </p>
-                                <div class="text-green-700 hover:text-green-900">
-                                    <a target="_blank"
-                                        x-bind:href="`https://twitter.com/intent/tweet?text=Ik heb net ${phone_numbers_created_this_session} telefoonnummers gered van ongevraagde telemarketing op donotcallanyone.be 🦸`">
-                                        <svg class="fill-current h-8 w-8" viewBox="0 0 60 60">
-                                            <path
-                                                d="M41.05 18.44a6.6 6.6 0 00-4.84-2.29c-3.66-.06-6.62 3.04-6.62 6.91 0 .55.05 1.09.17 1.6a18.68 18.68 0 01-13.66-7.55 7.33 7.33 0 00-.9 3.55 7.3 7.3 0 002.95 5.92 6.34 6.34 0 01-3-.92v.1c0 3.42 2.28 6.3 5.31 6.97a6.24 6.24 0 01-3 .1 6.74 6.74 0 006.2 4.93 12.8 12.8 0 01-9.81 2.9A17.89 17.89 0 0024 43.85c12.19 0 18.86-10.61 18.86-19.81l-.02-.9c1.3-.97 2.42-2.18 3.3-3.56-1.18.54-2.46.9-3.8 1.04a6.8 6.8 0 002.91-3.8c-1.28.77-2.7 1.33-4.2 1.62z" />
-                                        </svg>
-                                    </a>
+                    <template x-if="dncm_account.id && phone_numbers_created_this_session && !area_code_in_progress">
+                        <div class="my-12">
+                            <div class=" pt-8 pb-2 rounded-t bg-green-100 text-green-900 text-center mx-auto">
+                                <div class="flex justify-center items-center">
+                                    <p>
+                                        🙏 België is je dankbaar voor de <span class=""
+                                            x-text="phone_numbers_created_this_session"></span> nummers die je hebt
+                                        toegevoegd!
+                                    </p>
+                                    <div class="text-green-700 hover:text-green-900">
+                                        <a target="_blank"
+                                            x-bind:href="`https://twitter.com/intent/tweet?text=Ik heb net ${phone_numbers_created_this_session} telefoonnummers gered van ongevraagde telemarketing op donotcallanyone.be 🦸`">
+                                            <svg class="fill-current h-8 w-8" viewBox="0 0 60 60">
+                                                <path
+                                                    d="M41.05 18.44a6.6 6.6 0 00-4.84-2.29c-3.66-.06-6.62 3.04-6.62 6.91 0 .55.05 1.09.17 1.6a18.68 18.68 0 01-13.66-7.55 7.33 7.33 0 00-.9 3.55 7.3 7.3 0 002.95 5.92 6.34 6.34 0 01-3-.92v.1c0 3.42 2.28 6.3 5.31 6.97a6.24 6.24 0 01-3 .1 6.74 6.74 0 006.2 4.93 12.8 12.8 0 01-9.81 2.9A17.89 17.89 0 0024 43.85c12.19 0 18.86-10.61 18.86-19.81l-.02-.9c1.3-.97 2.42-2.18 3.3-3.56-1.18.54-2.46.9-3.8 1.04a6.8 6.8 0 002.91-3.8c-1.28.77-2.7 1.33-4.2 1.62z" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div
+                                    class="mt-4 py-1 text-sm border-t border-green-900 border-opacity-20 w-1/2 mx-auto text-center">
+                                    <p class="mt-4">
+                                        Je kan die nummers terugvinden op <a class="underline"
+                                            href="https://www.dncm.be/nl/app/login-nl/" target="_blank">de Belgische
+                                            do-not-call
+                                            website</a>
+                                    </p>
+                                    <p class="font-mono text-green-800">
+                                        inlognaam: <span x-text="dncm_account.login"></span>
+                                    </p>
+                                    <p class="font-mono text-green-800">
+                                        wachtwoord: <span x-text="dncm_account.password"></span>
+                                    </p>
                                 </div>
                             </div>
-                            <div
-                                class="mt-4 py-1 text-sm border-t border-green-900 border-opacity-20 w-1/2 mx-auto text-center">
-                                <p class="mt-4">
-                                    Je kan die nummers terugvinden op <a class="underline"
-                                        href="https://www.dncm.be/nl/app/login-nl/" target="_blank">de Belgische
-                                        do-not-call
-                                        website</a>
+                            <!-- <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse text-center rounded-b">
+                                <p class="text-xs text-gray-500">
+                                    Als je wil kan je <a href="https://www.buymeacoffee.com/st8nicmpr" target="_blank"
+                                        class="underline">bijdragen
+                                        in de serverkosten</a>.
                                 </p>
-                                <p class="font-mono text-green-800">
-                                    inlognaam: <span x-text="dncm_account.login"></span>
-                                </p>
-                                <p class="font-mono text-green-800">
-                                    wachtwoord: <span x-text="dncm_account.password"></span>
-                                </p>
-                            </div>
+                            </div> -->
                         </div>
                     </template>
-                    <template x-if="!dncm_account.id">
+                    <template x-if="!dncm_account.id || area_code_in_progress ">
                         <div class="my-12 p-8 rounded bg-indigo-100 text-indigo-900 text-center">
                             <p>
                                 💪 Help mee om België <strong>telefoonspam-vrij</strong> te maken.
