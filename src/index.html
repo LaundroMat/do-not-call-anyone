@@ -67,7 +67,7 @@
                             </div>
                         </h2>
 
-                        <template x-show="!quota_exceeded">
+                        <template x-if="!quota_exceeded">
                             <div class="md:flex justify-center mt-12 md:gap-x-8">
                                 <div class="p-4 md:rounded md:shadow-lg">
                                     <div class="text-gray-500 tracking-wider">
@@ -177,7 +177,7 @@
                                                     x-bind:value="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 1"></progress>
                                             </div>
                                         </div>
-                                        <template x-show="!quota_exceeded">
+                                        <template x-if="!quota_exceeded">
                                             <div class="flex gap-x-2 text-gray-500">
                                                 <div
                                                     x-text="area_code in (overall_progress || {}) ? overall_progress[area_code].latest : 0">
