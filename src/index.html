@@ -96,7 +96,8 @@
                         </template>
                     </div>
 
-                    <template x-if="dncm_account.id && phone_numbers_created_this_session && !area_code_in_progress">
+                    <template
+                        x-if="dncm_account.id && phone_numbers_created_this_session && !area_code_in_progress && !discovered">
                         <div class="my-12">
                             <div class=" pt-8 pb-2 rounded-t bg-green-100 text-green-900 text-center mx-auto">
                                 <div class="flex justify-center items-center">
@@ -140,7 +141,7 @@
                             </div> -->
                         </div>
                     </template>
-                    <template x-if="!dncm_account.id || area_code_in_progress ">
+                    <template x-if="(!dncm_account.id && !discovered) || area_code_in_progress ">
                         <div class="my-12 p-8 rounded bg-indigo-100 text-indigo-900 text-center">
                             <p>
                                 💪 Help mee om België <strong>telefoonspam-vrij</strong> te maken.
@@ -152,6 +153,27 @@
                             </p>
                         </div>
                     </template>
+
+                    <div class="my-12 p-8">
+                        <p class="text-red-700 text-center font-bold text-xl">
+                            😳 We zijn betrapt! We kunnen geen nummers meer toevoegen.
+                        </p>
+                        <div class="text-center mt-2 text-gray-500">
+                            <p>
+                                Ik werk aan een oplossing.
+                            </p>
+                            <p>
+                                Volg <a href="https://twitter.com/ProofOfThePuddn" target="_blank"
+                                    class="text-indigo-500 hover:underline">@ProofOfThePuddn</a>
+                                of
+                                hou
+                                de site in de gaten voor updates.
+                            </p>
+                        </div>
+                        <p class="text-center mt-2">
+                            ✊
+                        </p>
+                    </div>
                 </div>
 
                 <div class="md:flex justify-around text-3xl uppercase tracking-widest text-gray-300">
@@ -336,6 +358,7 @@
                                 </div>
                             </div>
                         </template>
+
                         <template x-if="!quota_exceeded">
                             <div
                                 class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
@@ -373,6 +396,15 @@
                                                     </span>
                                                 </p>
                                             </div>
+                                            <template x-if="discovered">
+                                                <div class="mt-2">
+                                                    <p class="text-sm text-red-700">
+                                                        Kan geen nummers meer toevoegen.. De toegang tot dncm van
+                                                        buitenaf is
+                                                        geblokkeerd.
+                                                    </p>
+                                                </div>
+                                            </template>
                                         </div>
                                     </div>
                                 </div>
@@ -479,6 +511,7 @@
             pinged_area_code: null, // area code being updated (i.e. modified in firestore, so also when someone else does it)
 
             quota_exceeded: false,
+            discovered: true,
 
             init: async function () {
                 // response = await axios.get(API_URL)
@@ -533,20 +566,29 @@
                     'gender': genders[Math.floor(Math.random() * genders.length)]
                 }
 
-                response = await axios.post('https://www.dncm.be/wp-json/app/v1/consumerregistration', fake_user_data)
-                console.debug(response)
-                console.debug(response.data)
-                Object.assign(this.dncm_account, response.data, { 'password': fake_user_data.pass })
+                try {
+                    response = await axios.post('https://www.dncm.be/wp-json/app/v1/consumerregistration', fake_user_data)
+                } catch (error) {
+                    if (error.message == "network_error") {
+                        this.discovered = true
+                    }
+                }
 
-                // Get token too
+                if (!this.discovered) {
+                    console.debug(response)
+                    console.debug(response.data)
+                    Object.assign(this.dncm_account, response.data, { 'password': fake_user_data.pass })
 
-                response = await axios.post("https://www.dncm.be/wp-json/jwt-auth/v1/token", {
-                    username: fake_user_data.login,
-                    password: fake_user_data.pass
-                })
-                console.debug(response)
-                console.debug(response.data)
-                Object.assign(this.dncm_account, { token: response.data.token })
+                    // Get token too
+
+                    response = await axios.post("https://www.dncm.be/wp-json/jwt-auth/v1/token", {
+                        username: fake_user_data.login,
+                        password: fake_user_data.pass
+                    })
+                    console.debug(response)
+                    console.debug(response.data)
+                    Object.assign(this.dncm_account, { token: response.data.token })
+                }
             },
 
             addPhoneNumbers: async function (area_code) {
